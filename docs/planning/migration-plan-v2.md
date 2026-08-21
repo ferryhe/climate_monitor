@@ -12,45 +12,68 @@ Contract -> Storage -> Monitor/WebListening
 
 It proves that Monitor can commit one validated, immutable canonical bundle with evidence, a deterministic Markdown projection, and a provenance receipt. Consumer work starts from frozen bundle fixtures and the stable slice rather than from legacy file formats.
 
-## 2. Dependency map
+## 2. Dependency and runtime maps
 
-```text
-Epic
-  |
-  v
-Contract
-  |
-  v
-Storage
-  |
-  v
-Monitor / WebListening  ---- minimum vertical slice
-  |          |          |          |          |
-  v          v          v          v          v
-Delivery    Wiki     RAG/Chat   Web/API/UI   Keyword Graphify
-  \          |          |          |          /
-   +---------+----------+----------+---------+
-                         |
-                         v
-                  Publisher adapter
-                         |
-                         v
-          E2E + conformance + dual-run + cutover
-                         |
-                         v
-            Normal scheduled-run observation
+The first map shows implementation prerequisites. A solid arrow is a required prerequisite; a dotted arrow identifies fixture-driven or integration work that may proceed in parallel.
 
-Phase 2 after a stable v2 operational baseline:
-Admin Prompt/Taxonomy UI
+```mermaid
+flowchart TD
+  C["#4 Contract"] --> S["#5 Storage core"]
+  S --> M["#6 Monitor / WebListening"]
+  C -. "fixtures" .-> D["#7 Delivery"]
+  C -. "fixtures" .-> W["#8 Wiki"]
+  C -. "fixtures" .-> R["#9 RAG / Chat"]
+  C -. "fixtures" .-> U["#10 Web / API / UI"]
+  C -. "fixtures" .-> G["#11 Keyword Graphify"]
+  S -. "persisted integration" .-> D
+  S -. "persisted integration" .-> W
+  S --> R
+  S --> U
+  S -. "persisted integration" .-> G
+  M -. "live integration" .-> D
+  M -. "live integration" .-> W
+  M -. "live integration" .-> R
+  M -. "live integration" .-> U
+  M -. "live integration" .-> G
+  C --> P["#12 Publisher"]
+  S --> P
+  T["Selected publication-target interfaces only"] -.-> P
+  M --> E["#13 E2E / cutover / observation"]
+  D --> E
+  W --> E
+  R --> E
+  U --> E
+  G --> E
+  P --> E
+  E --> A["#14 Admin UI"]
+```
+
+The second map shows runtime artifact flow. Monitor commits once to immutable storage; consumers read the same persisted bundle version independently.
+
+```mermaid
+flowchart LR
+  H["Hermes runtime"] --> M["Monitor / WebListening"]
+  M -->|"atomic commit"| S[("Immutable artifacts + read model")]
+  S --> D["Delivery"]
+  S --> W["Wiki"]
+  S --> R["RAG / Chat"]
+  S --> U["Web / API / UI"]
+  S --> G["Keyword Graphify"]
+  S --> P["Publisher"]
+  P --> T["Selected publication targets"]
 ```
 
 Contract fixtures may unblock consumer scaffolding before the live Monitor is complete. Integration acceptance for every consumer still requires persisted bundles from the minimum vertical slice. Publisher work may begin against fixtures, but production promotion is gated by E2E and cutover approval.
 
-## 3. Roadmap issues in execution order
+## 3. Roadmap workstreams and gates
+
+Numbering is presentation order. Delivery, Wiki, RAG/Chat, Web/API/UI, and Keyword Graphify may proceed in parallel once their stated fixture prerequisites are available.
 
 ### 1. Epic: Modular Canonical Pipeline v2
 
-Track scope, architecture decisions, dependencies, risks, and the acceptance state of every child issue. The epic is complete only after the normal scheduled-run observation succeeds or the approved rollback has been completed and documented.
+Track scope, architecture decisions, dependencies, risks, and the acceptance state of every child issue. Production completion requires a successful normal scheduled-run observation. If an actual rollback occurs, the epic remains open for bounded corrective work unless the owner explicitly approves abandonment with the rollback evidence preserved.
+
+Before implementation PRs begin, record a reviewed legacy inventory: exact v1 commit(s), deployed-configuration evidence, known job behavior, source provenance for sanitized fixtures, the agreed Wiki baseline, and a migrate/project/archive/retire disposition for each legacy element.
 
 ### 2. Contract
 
@@ -65,7 +88,7 @@ Acceptance gate:
 
 ### 3. Storage
 
-Build immutable artifact persistence and a minimal read model using the artifact protocol. Support atomic commit, digest verification, idempotent replay, report lookup, run lookup, and evidence lookup.
+Implement the immutable persistence and read-model core of `modules/web_storage` using the artifact protocol. Support atomic commit, digest verification, idempotent replay, report lookup, run lookup, and evidence lookup.
 
 Depends on: Contract.
 
@@ -103,7 +126,7 @@ Depends on: Contract and Storage read APIs; integration depends on the minimum v
 
 ### 8. Web/API/UI
 
-Expose immutable artifacts and read-model views for history, detail, evidence, provenance, and operational status. Do not create alternate mutable report state.
+Complete the API, access-control, and Web UI surfaces of the same `modules/web_storage` module, using the persistence/read-model core delivered by Storage. Storage and Web/API/UI are implementation increments of one module, not sibling services. Expose immutable artifacts and read-model views for history, detail, evidence, provenance, and operational status. Do not create alternate mutable report state.
 
 Depends on: Storage and Contract; full report views depend on the minimum vertical slice.
 
@@ -117,7 +140,7 @@ Depends on: Contract fixtures; integration depends on Storage and the minimum ve
 
 Implement controlled, idempotent promotion of already validated artifacts. Verify digests and preconditions, record publication receipts, and keep approval/deployment policy explicit.
 
-Depends on: Contract, Storage, and the target consumer publication interfaces.
+Depends on: Contract, Storage, and only the selected publication-target interfaces. RAG/Chat and unrelated consumers are not implicit prerequisites.
 
 ### 11. E2E/conformance, dual-run, cutover, rollback, and normal scheduled observation
 
@@ -193,6 +216,8 @@ Prepare and test:
 - an incident receipt that records what ran, what was published, and what was restored.
 
 If v2 has published a valid immutable bundle before rollback, retain it with its status and provenance. Do not rewrite or delete it to imitate the old system.
+
+The epic remains open until a normal scheduled observation succeeds. After an actual rollback, preserve and approve the evidence, then either retry through bounded corrective work or close the epic only through an explicit abandonment decision. A rolled-back deployment is not production-complete.
 
 ## 8. Normal scheduled observation
 

@@ -6,22 +6,17 @@ Climate Monitor is being redesigned as a modular monorepo whose components excha
 
 The v2 pipeline has one business source of truth: `bundle.json`.
 
-```text
-Hermes (schedule/runtime/secrets/logs only)
-    |
-    v
-Monitor + WebListening
-collect -> normalize -> relevance -> dedupe -> final selection
-        -> deterministic statistics -> one authoring pass
-    |
-    v
-canonical bundle + content-addressed evidence + run receipt
-    |
-    +--> Delivery
-    +--> Wiki
-    +--> RAG/Chat
-    +--> Web/Storage API and UI
-    +--> Canonical Keyword Graphify
+```mermaid
+flowchart LR
+  H["Hermes runtime"] --> M["Monitor / WebListening"]
+  M -->|"atomic commit"| S[("Immutable artifacts + read model")]
+  S --> D["Delivery"]
+  S --> W["Wiki"]
+  S --> R["RAG / Chat"]
+  S --> U["Web / API / UI"]
+  S --> G["Canonical Keyword Graphify"]
+  S --> P["Publisher"]
+  P --> T["Selected publication targets"]
 ```
 
 The core rules are:

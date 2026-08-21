@@ -154,7 +154,7 @@ RAG/Chat is a separate module. It indexes versioned bundles and referenced evide
 
 ### Web/API/UI
 
-Web/API/UI belongs with immutable storage and read models. It exposes report history, report detail, evidence, receipts, and module status without mutating canonical artifacts.
+Web/API/UI belongs with immutable storage and read models in the same `modules/web_storage` module. Persistence/read-model work and API/UI work may land as separate implementation increments, but they must share one artifact identity resolver and must not become sibling storage and web services. The module exposes report history, report detail, evidence, receipts, and module status without mutating canonical artifacts.
 
 ### Canonical Keyword Graphify
 
@@ -176,7 +176,7 @@ Hermes must be deliberately boring. A typical job checks out an approved deploye
 
 ### Publisher
 
-The publisher adapter promotes already validated immutable artifacts. It verifies digests and preconditions, is idempotent, records publication receipts, and never regenerates or edits the bundle. Human-review or environment-approval gates remain outside the adapter's semantic behavior.
+The publisher adapter promotes already validated immutable artifacts to explicitly selected publication targets. It depends only on storage and the interfaces of those selected targets; RAG/Chat and unrelated consumers are not implicit prerequisites. It verifies digests and preconditions, is idempotent, records publication receipts, and never regenerates or edits the bundle. Human-review or environment-approval gates remain outside the adapter's semantic behavior.
 
 ## 9. Compatibility and provenance policy
 
