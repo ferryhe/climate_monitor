@@ -210,5 +210,5 @@ The conformance suite must eventually verify:
 - receipt-to-artifact digest closure;
 - atomic commit and idempotent replay;
 - every consumer operates from bundle fixtures with Monitor and legacy files absent;
-- Keyword Graphify reads only canonical keywords and never changes Wiki files;
+- Canonical Keyword Graphify reads only canonical keywords and never changes Wiki files;
 - Hermes adapter contains no business configuration or authoring logic.

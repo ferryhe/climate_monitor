@@ -24,7 +24,7 @@ flowchart TD
   C -. "fixtures" .-> W["#8 Wiki"]
   C -. "fixtures" .-> R["#9 RAG / Chat"]
   C -. "fixtures" .-> U["#10 Web / API / UI"]
-  C -. "fixtures" .-> G["#11 Keyword Graphify"]
+  C -. "fixtures" .-> G["#11 Canonical Keyword Graphify"]
   S -. "persisted integration" .-> D
   S -. "persisted integration" .-> W
   S --> R
@@ -58,7 +58,7 @@ flowchart LR
   S --> W["Wiki"]
   S --> R["RAG / Chat"]
   S --> U["Web / API / UI"]
-  S --> G["Keyword Graphify"]
+  S --> G["Canonical Keyword Graphify"]
   S --> P["Publisher"]
   P --> T["Selected publication targets"]
 ```
@@ -67,7 +67,7 @@ Contract fixtures may unblock consumer scaffolding before the live Monitor is co
 
 ## 3. Roadmap workstreams and gates
 
-Numbering is presentation order. Delivery, Wiki, RAG/Chat, Web/API/UI, and Keyword Graphify may proceed in parallel once their stated fixture prerequisites are available.
+Numbering is presentation order. Delivery, Wiki, RAG/Chat, Web/API/UI, and Canonical Keyword Graphify may proceed in parallel once their stated fixture prerequisites are available.
 
 ### 1. Epic: Modular Canonical Pipeline v2
 
@@ -230,7 +230,7 @@ After cutover, keep the roadmap open through at least one normal scheduled cycle
 - Delivery recipients and publication targets received no duplicates;
 - Wiki structure and Web/API read models are healthy;
 - RAG/Chat citations resolve to canonical identities/evidence;
-- Keyword Graphify is reproducible and Wiki files are unchanged by its run;
+- Canonical Keyword Graphify is reproducible and Wiki files are unchanged by its run;
 - operational alerts, logs, latency, and resource use are within agreed thresholds.
 
 Close the deployment issue only after the observation record is reviewed. If the cycle fails materially, execute the approved rollback or open a bounded corrective issue while preserving evidence.
