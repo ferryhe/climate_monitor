@@ -1,0 +1,24 @@
+# --- temporary / scratch directories ---
+.tmp_backup/
+.review_tmp/
+.review_*/
+
+# --- editor & OS cruft ---
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- local scratch files ---
+*.tmp
+*.bak
+*~
+
+# --- Python (in case the repo gains code later) ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
